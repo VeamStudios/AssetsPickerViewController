@@ -304,7 +304,8 @@ extension AssetsManager {
     }
     
     @discardableResult
-    open func select(album newAlbum: PHAssetCollection) -> Bool {
+    open func select(album newAlbum: PHAssetCollection?) -> Bool {
+        guard let newAlbum = newAlbum else { return false }
         if let oldAlbumIdentifier = self.selectedAlbum?.localIdentifier, oldAlbumIdentifier == newAlbum.localIdentifier {
             logi("Selected same album.")
             return false
@@ -500,25 +501,19 @@ extension AssetsManager {
         // get sorted albums
         let sortedAlbums = self.sortedAlbums(fromAlbums: fetchedAlbums)
         
+    
+        
         // set default album
         if let defaultAlbum = self.defaultAlbum {
             logi("Default album is \"\(defaultAlbum.localizedTitle ?? "")\"")
+        } else if let cameraRollAlbum = self.cameraRollAlbum {
+            self.defaultAlbum = cameraRollAlbum
+            logw("Set default album with fallback default album \"\(cameraRollAlbum.localizedTitle ?? "")\"")
+        } else if let firstAlbum = sortedAlbums.first {
+            self.defaultAlbum = firstAlbum
+            loge("Set default album with first item \"\(firstAlbum.localizedTitle ?? "")\"")
         } else {
-            if let defaultAlbum = self.defaultAlbum {
-                logi("Set default album \"\(defaultAlbum.localizedTitle ?? "")\"")
-            } else {
-                if let cameraRollAlbum = self.cameraRollAlbum {
-                    self.defaultAlbum = cameraRollAlbum
-                    logw("Set default album with fallback default album \"\(cameraRollAlbum.localizedTitle ?? "")\"")
-                } else {
-                    if let firstAlbum = sortedAlbums.first, type == .smartAlbum {
-                        self.defaultAlbum = firstAlbum
-                        loge("Set default album with first item \"\(firstAlbum.localizedTitle ?? "")\"")
-                    } else {
-                        logc("Is this case could happen? Please raise an issue if you've met this message.")
-                    }
-                }
-            }
+            logc("Is this case could happen? Please raise an issue if you've met this message.")
         }
         
         // append album fetch result
