@@ -493,7 +493,7 @@ extension AssetsPhotoViewController {
         if let albumTitle = album?.localizedTitle {
             titleString = "\(albumTitle) ▾"
         } else {
-            titleString = "Albums"
+            titleString = ""
         }
         return titleString
     }
