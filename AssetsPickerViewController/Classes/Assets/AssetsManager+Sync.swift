@@ -192,21 +192,21 @@ extension AssetsManager: PHPhotoLibraryChangeObserver {
 		}
     }
 	
-	private func handlePhotoLibraryChanges(_ changeInstance: PHChange) {
-		print("Handle photo library changes")
-		guard notifyIfAuthorizationStatusChanged() else {
-			logw("Does not have access to photo library.")
-			return
-		}
-		
-		let fetchMapBeforeChanges = fetchMap
+    private func handlePhotoLibraryChanges(_ changeInstance: PHChange) {
+        print("Handle photo library changes")
+        guard notifyIfAuthorizationStatusChanged() else {
+            logw("Does not have access to photo library.")
+            return
+        }
+        
+        let fetchMapBeforeChanges = fetchMap
         let updatedAlbumIndexSets = synchronizeAlbums(changeInstance: changeInstance)
         synchronizeAssets(
             updatedAlbumIndexSets: updatedAlbumIndexSets,
             fetchMapBeforeChanges: fetchMapBeforeChanges,
             changeInstance: changeInstance
         )
-	}
+    }
     
     public func removedIndexPaths(from newAlbums: [PHAssetCollection], oldAlbums: [PHAssetCollection], section: Int) -> (indexPaths: [IndexPath], albums: [PHAssetCollection]) {
         // find removed indexPaths
