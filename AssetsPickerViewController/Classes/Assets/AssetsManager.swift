@@ -49,13 +49,29 @@ open class AssetsManager: NSObject {
     var fetchedAlbumsArray = [[PHAssetCollection]]()
     /// stores sorted array by applying user defined comparator, it's in decreasing order by count by default, and it might same as fetchedAlbumsArray if AssetsPickerConfig has  albumFetchOptions without albumComparator
     var sortedAlbumsArray = [[PHAssetCollection]]()
-    internal(set) open var assetArray = [PHAsset]()
+	
+	private let assetArrayQueue = DispatchQueue(label: "com.assetsPickerViewController.assetArrayQueue")
+	private var _assetArray = [PHAsset]()
+	
+	internal(set) open var assetArray: [PHAsset] {
+		get {
+			return assetArrayQueue.sync { _assetArray }
+		}
+		set {
+			assetArrayQueue.sync { [weak self] in
+				self?._assetArray = newValue
+			}
+		}
+	}
     
     fileprivate(set) open var defaultAlbum: PHAssetCollection?
     fileprivate(set) open var cameraRollAlbum: PHAssetCollection!
     fileprivate(set) open var selectedAlbum: PHAssetCollection?
     
     fileprivate var isFetchedAlbums: Bool = false
+	
+	let photoLibraryChangesQueue = DispatchQueue(label: "com.assetsPickerViewController.photoLibraryChangesQueue")
+  
     
     private override init() {
         super.init()
