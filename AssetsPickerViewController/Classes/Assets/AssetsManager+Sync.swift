@@ -187,10 +187,18 @@ extension AssetsManager: PHPhotoLibraryChangeObserver {
     }
 
     public func photoLibraryDidChange(_ changeInstance: PHChange) {
+		photoLibraryChangesQueue.async { [weak self] in
+			self?.handlePhotoLibraryChanges(changeInstance)
+		}
+    }
+	
+    private func handlePhotoLibraryChanges(_ changeInstance: PHChange) {
+        print("Handle photo library changes")
         guard notifyIfAuthorizationStatusChanged() else {
             logw("Does not have access to photo library.")
             return
         }
+        
         let fetchMapBeforeChanges = fetchMap
         let updatedAlbumIndexSets = synchronizeAlbums(changeInstance: changeInstance)
         synchronizeAssets(
